@@ -1,0 +1,4 @@
+model_name: qwen-2.5-3b
+steps: 20
+campaigns: 10
+method: care
