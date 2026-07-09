@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from src.experiments.care_chain import CAREChainExperiment
+from src.utils.logging import configure_logging
 
 
 def main() -> None:
@@ -16,8 +17,9 @@ def main() -> None:
     args = parser.parse_args()
 
     experiment = CAREChainExperiment(output_dir=Path(args.output_dir), steps=args.steps_per_campaign)
+    logger = configure_logging(args.output_dir)
     result = experiment.run()
-    print(result)
+    logger.info("CARE chain result: %s", result)
 
 
 if __name__ == "__main__":

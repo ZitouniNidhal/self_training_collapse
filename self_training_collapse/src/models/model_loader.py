@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
+import json
 
 
 @dataclass
@@ -47,9 +49,33 @@ class ModelLoader:
 
     def save_checkpoint(self, path: str) -> None:
         """Simulate saving the current model checkpoint to the given path."""
-        # In a real implementation: torch.save(self.loaded_model.state_dict(), path)
-        pass
+        if self.loaded_model is None:
+            raise RuntimeError("No model loaded to save checkpoint")
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "name": self.loaded_model.name,
+            "parameters": self.loaded_model.parameters,
+            "architecture": self.loaded_model.architecture,
+            "quantized": self.loaded_model.quantized,
+        }
+        try:
+            p.write_text(json.dumps(payload), encoding="utf-8")
+        except Exception as exc:
+            raise IOError(f"Failed to write checkpoint to {p}: {exc}") from exc
 
     def load_checkpoint(self, path: str) -> None:
         """Simulate loading model weights from a checkpoint path."""
-        pass
+        p = Path(path)
+        if not p.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {p}")
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            self.loaded_model = ModelConfig(
+                name=data.get("name", self.model_name),
+                parameters=int(data.get("parameters", 0)),
+                architecture=data.get("architecture", "transformer"),
+                quantized=bool(data.get("quantized", False)),
+            )
+        except Exception as exc:
+            raise IOError(f"Failed to load checkpoint {p}: {exc}") from exc
