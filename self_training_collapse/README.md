@@ -150,7 +150,7 @@ memory.record(
 Decides whether to reuse, adapt, pilot, or reject a strategy:
 
 ```python
-from src.care.gate import TransferGate
+from src.care.gate import TransferGate        
 
 gate = TransferGate(protected_capabilities=["diversity", "hard_case_acc"])
 decision = gate.evaluate(strategy, current_context, memory)
