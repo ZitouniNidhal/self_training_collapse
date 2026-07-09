@@ -55,10 +55,13 @@ class CAREOrchestrator:
         Returns:
             CampaignResult: A dictionary containing the gate's decision and revision status.
         """
-        assert self.gate is not None
-        assert self.memory is not None
-        assert self.revision is not None
-        
+        if self.gate is None:
+            raise RuntimeError("Transfer gate is not initialized")
+        if self.memory is None:
+            raise RuntimeError("CapabilityEffectMemory is not initialized")
+        if self.revision is None:
+            raise RuntimeError("BeliefRevision is not initialized")
+
         decision = self.gate.evaluate(strategy, current_context, self.memory)
         self.memory.record(strategy, current_context, observed_delta, "default boundary", 0.5)
         revision_result = self.revision.update(self.memory, self.gate, observed_delta, predicted_delta)
